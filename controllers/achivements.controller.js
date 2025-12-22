@@ -29,8 +29,9 @@ const addAchievement = async (req, res) => {
             teamMembers, 
             AchievedDate, 
             Mentor, 
-            descriptionOfAchivements 
+            descriptionOfAchivement
         } = req.body;
+        console.log(req.body);
 
         if (!titleOfAchivement || !teamMembers || teamMembers.length === 0) {
             return res.status(400).json({ message: 'Missing core achievement details or team members.' });
@@ -44,11 +45,11 @@ const addAchievement = async (req, res) => {
             
             // Insert Achievement
             const achievementQuery = `
-                INSERT INTO Achievements (titleOfAchivement, teamName, AchievedDate, Mentor, descriptionOfAchivements)
+                INSERT INTO Achievements (titleOfAchivement, teamName, AchievedDate, Mentor, descriptionofachivements)
                 VALUES ($1, $2, $3, $4, $5)
                 RETURNING achievementid 
             `;
-            const achievementValues = [titleOfAchivement, teamName, AchievedDate, Mentor, descriptionOfAchivements];
+            const achievementValues = [titleOfAchivement, teamName, AchievedDate, Mentor, descriptionOfAchivement];
             const achievementResult = await connection.query(achievementQuery, achievementValues);
             const achievementId = achievementResult.rows[0].achievementid;
             
@@ -120,6 +121,7 @@ const getAchievements = async (req, res) => {
             }
         }
         const finalAchievements = Array.from(achievementsMap.values());
+        // console.log(finalAchievements);
         res.status(200).json({ success: true, data: finalAchievements });
     } catch (error) {
         console.error("Error:", error);
