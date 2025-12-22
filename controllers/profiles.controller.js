@@ -12,29 +12,47 @@ const getLoggedUserDetails = async (req, res) => {
         }
 
         const query = `
-            SELECT
-                u.email,
-                u.role,
+       SELECT
+    -- Logic to pick the correct email based on role
+    CASE 
+        WHEN f.role = 'faculty' THEN f.email 
+        WHEN u.role = 'student' THEN u.email -- or p.email if student table has it
+        ELSE u.email 
+    END AS email,
 
-                p.idno,
-                p.name,
-                p.branch,
-                p.year,
-                p.section,
-                p.phone_no,
-                p.cgpa,
-                p.skills,
-                p.achievements,
-                p.extra_circular_activities,
-                p.interests,
-                p.links
-            FROM users u
-            LEFT JOIN users_profile p
-            ON u.user_id = p.user_id
-            WHERE u.user_id = $1;
+    u.role,
+    u.user_id,
+    
+    -- Logic to pick the correct name based on role
+    CASE 
+        WHEN u.role = 'faculty' THEN f.name 
+        WHEN u.role = 'student' THEN p.name 
+        ELSE 'Admin' -- Default name for Admin
+    END AS name,
+
+    -- Student specific fields
+    p.idno,
+    p.branch,
+    p.section,
+    p.year,
+    p.phone_no,
+    p.cgpa,
+    p.skills,
+    p.achievements,
+    p.extra_circular_activities,
+    p.interests,
+    p.links,
+
+    -- Faculty specific fields
+    f.dept
+FROM users u
+LEFT JOIN users_profile p ON u.user_id = p.user_id
+LEFT JOIN usersfaculty f ON u.user_id = f.user_id
+WHERE u.user_id = $1;
         `;
 
         const { rows } = await db.query(query, [userId]);
+        console.log("+++++++++++++++++++++++++++++++++++++++++++++",rows);
 
         if (rows.length === 0) {
             return res.status(404).json({

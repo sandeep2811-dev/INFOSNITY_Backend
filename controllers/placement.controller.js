@@ -242,7 +242,7 @@ const selectedCandidates = async (req, res) => {
     const userEmail = req.session.userEmail;
     if (!userEmail) return res.status(401).json("Unauthorized");
     try {
-        const query = `SELECT rs.idno, rs.status, rs.package, p.placement_id, p.company_name, p.job_type, p.role FROM registered_students rs JOIN placements p ON rs.placement_id = p.placement_id WHERE rs.status IN ('Offered', 'Hired')`;
+        const query = `SELECT rs.idno, rs.name,rs.status, rs.package, p.placement_id, p.company_name, p.job_type, p.role FROM registered_students rs JOIN placements p ON rs.placement_id = p.placement_id WHERE rs.status IN ('Offered', 'Hired')`;
         const result = await db.query(query);
         const packages = result.rows.map(r => parseFloat(r.package?.replace(/LPA/i, "")) || 0);
         res.json({
