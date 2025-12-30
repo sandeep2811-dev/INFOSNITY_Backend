@@ -41,7 +41,7 @@
 import express from "express";
 import { loginUser, registerFaculty, forgotPassword, updatePassword, logoutUser, getAllUsers, getRealtimeMessages, checkAuth, getUnreadMessageCounts, markMessagesAsRead } from "../controllers/user.controller.js";
 import { Router } from "express";
-import { sendMail, displayMail } from "../controllers/mail.controller.js";
+import { sendMail, displayMail, sentMails,markAsRead} from "../controllers/mail.controller.js";
 import { mentions, retriveMentions } from "../controllers/mentions.controller.js";
 import { upload, uploadFile, getUserFiles, downloadFile } from "../controllers/files.controller.js";
 
@@ -55,6 +55,8 @@ router.get("/logout", logoutUser);
 
 router.post("/sendMail", sendMail);
 router.get("/displayMail", displayMail);
+router.get("/sentMails",sentMails);
+router.put("/markAsRead", markAsRead);
 
 // ✅ FIXED: Changed "/sendMention" to "/sendmention" to match frontend
 router.post("/sendmention", mentions);

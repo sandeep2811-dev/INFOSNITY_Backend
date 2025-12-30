@@ -33,7 +33,7 @@ const displayMail = async (req, res) => {
     if (role === "student") {
         try {
             const result = await db.query(
-                "SELECT * FROM mails WHERE role = $1 OR role = $2 OR toemail=$3",
+                "SELECT * FROM mails WHERE role = $1 OR role = $2 OR toemail=$3 order by id desc",
                 [role1, role2,userEmail]
             );
             const query = `
@@ -67,7 +67,7 @@ const displayMail = async (req, res) => {
     if (role === "faculty") {
         try {
             const result = await db.query(
-                "SELECT * FROM mails WHERE toemail = $1",
+                "SELECT * FROM mails WHERE toemail = $1 order by id desc",
                 [userEmail]
             );
             console.log(result.rows);
@@ -81,7 +81,7 @@ const displayMail = async (req, res) => {
     if (role === "administration") {
         try {
             const result = await db.query(
-                "SELECT * FROM mails WHERE toemail = $1",
+                "SELECT * FROM mails WHERE toemail = $1 order by id desc",
                 [userEmail]
             );
             return res.json({ message: "Mails fetched successfully", result:result.rows });
@@ -94,5 +94,30 @@ const displayMail = async (req, res) => {
         return res.json("Invalid user role");
 };
 
+const sentMails = async(req,res)=>{
+    const userEmail =req.session.userEmail;
+    if(!userEmail){
+        res.json("you first need to login");
+    }
+    try{
+        const result = await db.query("select * from mails where fromemail=$1 order by id desc",[userEmail]);
+        console.log(result.rows);
+        res.json({message:true,result:result.rows});
+    }catch(err){
+        console.log(err);
+        res.json("error occured");
+    }
+}
 
-export {sendMail,displayMail};
+const markAsRead = async (req, res) => {
+    const { mailId } = req.body;
+    try {
+        await db.query("UPDATE mails SET is_read = true WHERE id = $1", [mailId]);
+        res.json({ success: true });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json("Error updating mail status");
+    }
+};
+
+export { sendMail, displayMail, sentMails, markAsRead };
