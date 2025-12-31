@@ -33,8 +33,8 @@ const displayMail = async (req, res) => {
     if (role === "student") {
         try {
             const result = await db.query(
-                "SELECT * FROM mails WHERE role = $1 OR role = $2 OR toemail=$3 order by id desc",
-                [role1, role2,userEmail]
+                "SELECT * FROM mails WHERE role =$1 OR role = $2 AND toemail LIKE 'o%' ORDER BY id DESC",
+                [role1, role2]
             );
             const query = `
             SELECT
